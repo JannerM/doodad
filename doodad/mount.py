@@ -53,8 +53,8 @@ class MountLocal(Mount):
     """
     """
     def __init__(self, local_dir, mount_point=None, cleanup=True,
-                filter_ext=('.pyc', '.log', '.git', '.mp4'),
-                filter_dir=('data', '.git'),
+                filter_ext=('.pyc', '.log', '.mp4'),
+                filter_dir=(),
                 delete_before_mount=True,
                 **kwargs):
         """
@@ -119,7 +119,13 @@ class MountLocal(Mount):
         mount_dir = os.path.dirname(self.mount_point)
 
         if self.read_only:
-            shutil.copytree(self.local_dir, dep_dir, ignore=self.ignore_patterns)
+            # print("Ignore patterns:", self.ignore_patterns(self.local_dir, os.listdir(self.local_dir)))
+            shutil.copytree(self.local_dir, dep_dir) # , ignore=self.ignore_patterns)
+            for d in os.listdir(dep_dir):
+                if d == '.git':
+                    os.system("mv {} {}".format(os.path.join(dep_dir, ".git"), os.path.join(dep_dir, "git")))
+            print("sanity check: ", os.listdir(dep_dir))
+            # print("directory:", dep_dir)
         else:
             os.makedirs(dep_dir)
         with open(extract_file, 'w') as f:
@@ -134,7 +140,8 @@ class MountLocal(Mount):
             if self.pythonpath:
                 f.write('export PYTHONPATH=$PYTHONPATH:{mount_dir}\n'.format(mount_dir=mount_dir))
         os.chmod(extract_file, 0o777)
-
+        import pdb; pdb.set_trace()       
+ 
     def dar_extract_command(self):
         return './deps/local/{name}/extract.sh'.format(
             name=self.name,

@@ -180,6 +180,7 @@ def run_sweep_doodad_chunked(target, params, run_mode, mounts, num_chunks=10, do
                                                 use_nvidia_docker=run_mode.use_gpu,
                                                 mounts=mounts)
 
+        print("ARCHIVE: {}".format(archiv))
         sweeper = Sweeper(params)
         chunks = chunker(sweeper, num_chunks, confirm=confirm)
         for chunk in chunks:

@@ -43,6 +43,8 @@ RUN chmod +x /usr/local/bin/Xdummy
 
 # Workaround for https://bugs.launchpad.net/ubuntu/+source/nvidia-graphics-drivers-375/+bug/1674677
 COPY ./files/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+COPY ./files/environment.yml /opt/environment.yml
+COPY ./files/requirements.txt /opt/requirements.txt
 
 # Not sure why this is needed
 ENV LD_LIBRARY_PATH /usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
@@ -79,16 +81,12 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
 
 RUN conda update -y --name base conda && conda clean --all -y
 
-RUN conda create --name customenv python=3.6.5 pip
-RUN echo "source activate customenv" >> ~/.bashrc
+# RUN conda create --name attentive python=3.6.5 pip
+RUN conda env create -f /opt/environment.yml
+RUN echo "source activate /opt/conda/envs/attentive" >> ~/.bashrc
 # Use the railrl pip
 ENV OLDPATH $PATH
-ENV PATH /opt/conda/envs/customenv/bin:$PATH
-
-# Install packages here
-RUN pip install cloudpickle==0.5.2
-RUN pip install torch==1.1.0
-RUN pip install torchvision
+ENV PATH /opt/conda/envs/attentive/bin:$PATH
 
 ##########################################################
 ### gym sometimes has this patchelf issue

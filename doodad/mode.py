@@ -270,6 +270,7 @@ class EC2Mode(LaunchMode):
             sio.write("nvidia-smi\n")
             sio.write("echo 'Testing nvidia-smi inside docker'\n")
             sio.write("nvidia-docker run --rm {docker_image} nvidia-smi\n".format(docker_image=self.docker_image))
+            print("************** USING {docker_image} *****************".format(docker_image=self.docker_image))
 
         docker_cmd = '%s /tmp/remote_script.sh' % self.shell_interpreter
         sio.write(docker_cmd+'\n')

@@ -1,29 +1,20 @@
 from doodad.wrappers.easy_launch import sweep_function, save_doodad_config
-
-
+import os
 def example_function(doodad_config, variant):
-    x = variant['x']
-    y = variant['y']
-    z = variant['z']
-    import pdb; pdb.set_trace()
-    with open(doodad_config.output_directory + '/function_output.txt', "w") as f:
-        f.write('sum = {}'.format(x+y+z))
-    print('x, y, z = ', x, y, z)
+    os.system("export PYTHONPATH=$PYTHONPATH:/home/code && export CUDA_VISIBLE_DEVICES=0 && python /home/code/scripts/gpt.py --seed {seed} --n_epochs 1".format(seed=variant['seed']))
     save_doodad_config(doodad_config)
-
 
 if __name__ == "__main__":
     params_to_sweep = {
-        'x': [1, 2],
-        'y': [100],
+        'seed': [1, 2, 3],
+        # 'y': [100],
     }
     default_params = {
-        'z': 10,
     }
     for mode in [
         #'here_no_doodad',
-        'local',
-        # 'azure',
+        #'local',
+        'azure',
     ]:
         sweep_function(
             example_function,
