@@ -104,8 +104,6 @@ def write_docker_hook(arch_dir, image_name, mounts, verbose=False, use_nvidia_do
     with open(docker_hook_file, 'w') as f:
         f.write(builder.dump_script())
     os.chmod(docker_hook_file, 0o777)
-    os.system("cat {}".format(docker_hook_file))
-    import pdb; pdb.set_trace()
 
 def write_run_script(arch_dir, mounts, payload_script, verbose=False):
     runfile = os.path.join(arch_dir, 'run.sh')
@@ -143,7 +141,6 @@ def compile_archive(archive_dir, output_file, verbose=False):
         output_file=output_file,
         run_script='./docker.sh'
     )
-    print("Compile Command: {}".format(compile_cmd))
     pipe = subprocess.PIPE
     p = subprocess.Popen(compile_cmd, shell=True, stdout=pipe, stderr=pipe)
     p.communicate()
