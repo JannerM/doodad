@@ -121,11 +121,10 @@ class MountLocal(Mount):
         if self.read_only:
             # print("Ignore patterns:", self.ignore_patterns(self.local_dir, os.listdir(self.local_dir)))
             shutil.copytree(self.local_dir, dep_dir) # , ignore=self.ignore_patterns)
+            # HACK!!!!.
             for d in os.listdir(dep_dir):
                 if d == '.git':
                     os.system("mv {} {}".format(os.path.join(dep_dir, ".git"), os.path.join(dep_dir, "git")))
-            print("sanity check: ", os.listdir(dep_dir))
-            # print("directory:", dep_dir)
         else:
             os.makedirs(dep_dir)
         with open(extract_file, 'w') as f:
@@ -140,7 +139,6 @@ class MountLocal(Mount):
             if self.pythonpath:
                 f.write('export PYTHONPATH=$PYTHONPATH:{mount_dir}\n'.format(mount_dir=mount_dir))
         os.chmod(extract_file, 0o777)
-        import pdb; pdb.set_trace()       
  
     def dar_extract_command(self):
         return './deps/local/{name}/extract.sh'.format(
