@@ -70,16 +70,16 @@ query_metadata() {
         -o negative_timeout=120 \
         -o allow_other
 
-    if [ -d /doodad_tmp/$doodad_log_path ]
-    then
-        timestamp=$(date +%d-%m-%Y_%H-%M-%S)
-        randomid=$(uuidgen | cut -d '-' -f1)
-        doodad_log_path="${doodad_log_path}_copy_${timestamp}_${randomid}"
-        echo "directory exists. creating new log path ${doodad_log_path}"
-        mkdir -p /doodad_tmp/$doodad_log_path
-    else
-        mkdir -p /doodad_tmp/$doodad_log_path
-    fi
+    # if [ -d /doodad_tmp/$doodad_log_path ]
+    # then
+    #     timestamp=$(date +%d-%m-%Y_%H-%M-%S)
+    #     randomid=$(uuidgen | cut -d '-' -f1)
+    #     doodad_log_path="${doodad_log_path}_copy_${timestamp}_${randomid}"
+    #     echo "directory exists. creating new log path ${doodad_log_path}"
+    #     mkdir -p /doodad_tmp/$doodad_log_path
+    # else
+    mkdir -p /doodad_tmp/$doodad_log_path
+    # fi
     ln -s /doodad_tmp/$doodad_log_path /doodad
 
     # This logs in using the system-assigned identity. The system-assigned

@@ -772,7 +772,7 @@ class AzureMode(LaunchMode):
             azure_resource_group,
             resource_group_params
         )
-        vm_name = 'doodad-vm'
+        vm_name = 'ambr-doodad-vm'
         print('VM name:', vm_name)
         print('resource group id:', resource_group.id)
 

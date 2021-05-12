@@ -5,18 +5,18 @@ CODE_DIRS_TO_MOUNT = [
 ]
 NON_CODE_DIRS_TO_MOUNT = [
    dict(
-      local_dir='/media/4tb/qcli/projects/attentive-mbrl',
+      local_dir='/home/janner/mount/attentive-mbrl',
       mount_point='/home/attentive-mbrl',
    ),
 ]
 REMOTE_DIRS_TO_MOUNT = []
-LOCAL_LOG_DIR = '/media/4tb/qcli/projects/doodad_logs/'
+LOCAL_LOG_DIR = '/home/janner/mount/logs/doodad/'
 
 DEFAULT_AZURE_GPU_MODEL = 'nvidia-tesla-v100'
 DEFAULT_AZURE_INSTANCE_TYPE = 'Standard_DS1_v2'
-DEFAULT_AZURE_REGION = 'westus'
+DEFAULT_AZURE_REGION = 'eastus'
 
-DEFAULT_DOCKER = 'docker.io/qcli/attentive-mbrl:latest'
+DEFAULT_DOCKER = 'docker.io/jannerm/ambr:latest'
 
 try:
     AZ_SUB_ID=os.environ['AZURE_SUBSCRIPTION_ID']

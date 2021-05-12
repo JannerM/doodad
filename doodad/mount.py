@@ -54,7 +54,7 @@ class MountLocal(Mount):
     """
     def __init__(self, local_dir, mount_point=None, cleanup=True,
                 filter_ext=('.pyc', '.log', '.mp4'),
-                filter_dir=(),
+                filter_dir=('logs','slurm','pytorch-vqvae','plotting','data','attentive.egg-info'),
                 delete_before_mount=True,
                 **kwargs):
         """
@@ -86,6 +86,7 @@ class MountLocal(Mount):
         :param kwargs:
         """
         super(MountLocal, self).__init__(mount_point=mount_point, **kwargs)
+        print("FILTER", filter_dir)
         self.local_dir = os.path.realpath(os.path.expanduser(local_dir))
         self._name = self.local_dir.replace('/', '_')
         self.sync_dir = self.local_dir
@@ -120,7 +121,7 @@ class MountLocal(Mount):
 
         if self.read_only:
             # print("Ignore patterns:", self.ignore_patterns(self.local_dir, os.listdir(self.local_dir)))
-            shutil.copytree(self.local_dir, dep_dir) # , ignore=self.ignore_patterns)
+            shutil.copytree(self.local_dir, dep_dir, ignore=self.ignore_patterns)
             # HACK!!!!.
             for d in os.listdir(dep_dir):
                 if d == '.git':
