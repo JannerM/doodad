@@ -25,7 +25,7 @@ def upload_file_to_gcp_storage(
         bucket = storage_client.get_bucket(bucket_name)
         blob = bucket.blob(remote_path)
         if check_exists and blob.exists(storage_client):
-            print("{remote_path} already exists".format(remote_path=remote_path))
+            print("[ gcp_util ] {remote_path} already exists".format(remote_path=remote_path))
             return remote_path
         blob.upload_from_filename(file_name)
     return remote_path

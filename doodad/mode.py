@@ -893,6 +893,11 @@ class AzureMode(LaunchMode):
                 vm_name=vm_name,
                 parameters=vm_parameters,
             )
+            ##
+            # import pdb; pdb.set_trace()
+            # compute_client.ssh_public_keys.create(resource_group_name=azure_resource_group, ssh_public_key_name='/home/janner/.ssh/id_rsa.pub', parameters=vm_parameters)
+            #.generate_key_pair(resource_group_name=azure_resource_group, ssh_public_key_name='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC5j3+TnBHkUJ+nI4xar2JY6R4Kbq/e5DjTla8dMkM5w0WZAQr9NbGpHURlJynuqORU5APv35J1yv/M3uXvULCxTjAsGtDnKvWVo9RQDiaoJUDUMX8zGyBUZke6ZyDgLLTw4vx3SNrpYKwJjdFxScIbTQPcCrxWlb6P6RRSoiYSXwV7MfevLZyipUcd5ZQnVGt5MNJmBX2pISvCCQa0upirHywO3R/tJFSyJubEbAxtXczqRjNoZCXj7sDGWitWm0G6V3nX36dsAocBTEX3fQG4dPw+TUe+VEleOJKBhu+9S76ulkFm9c6ZHx1a5slx7U8d19VjnMVlKKF2aYtCG0tYL4EHCuO66FHHP1R70rETRsGz+h8VYGAUAfzzX/PpW/TqZlxXf0OwWlVWEz607KOdYxiMFpixTh0j/iLabY7QpSVQswpjodCEHcPRh7Id37YJa1HAtb9nu3DwqjSEUizqh9Iw60UZe8dsicA4uhFOTJWEjEYTPKbfeP5qLIiu8huXwEtAmkFpuBwMxJyI0VZL/nGVhXgpGTiGIO+vzWppxXpFociv2fzk8DJ/yQd7tDlgjqOeVYf2lfiKLMV0Yw5cYf/vONnM5r/5KE7qqpg3AdGxLYrd4hz3HGjzUdv6iiUMRP/apm9Ww8XATEMrb/LI6uYBUITjRfOoG4xkWg7pow== janner@mit.edu')
+            ##
             vm_result = vm_poller.result()
 
             # We need to ensure that the VM has permissions to delete its own

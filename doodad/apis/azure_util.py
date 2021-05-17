@@ -33,8 +33,9 @@ def upload_file_to_azure_storage(
             except azure.core.exceptions.ResourceNotFoundError:
                 exists = False
             if exists:
-                print("{remote_path} already exists".format(remote_path=remote_path))
+                print("[ azure_util ] {remote_path} already exists".format(remote_path=remote_path))
                 return remote_path
+        # print(f'[ azure_util ] WARNING: not checking if file exists: {remote_path}')
         with open(filename, "rb") as data:
             blob_client.upload_blob(data)
     return remote_path
