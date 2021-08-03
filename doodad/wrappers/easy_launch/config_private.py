@@ -9,10 +9,16 @@ NON_CODE_DIRS_TO_MOUNT = [
       mount_point='/home/attentive-mbrl',
    ),
 ]
-REMOTE_DIRS_TO_MOUNT = []
+REMOTE_DIRS_TO_MOUNT = [
+    dict(
+        local_dir='/doodad_tmp/',
+        mount_point='/doodad_tmp/',
+    ),
+]
 LOCAL_LOG_DIR = '/home/janner/mount/logs/doodad/'
 
-DEFAULT_AZURE_GPU_MODEL = 'nvidia-tesla-v100'
+# DEFAULT_AZURE_GPU_MODEL = 'nvidia-tesla-v100'
+DEFAULT_AZURE_GPU_MODEL = 'nvidia-tesla-t4'
 DEFAULT_AZURE_INSTANCE_TYPE = 'Standard_DS1_v2'
 DEFAULT_AZURE_REGION = 'eastus'
 
