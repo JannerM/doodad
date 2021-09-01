@@ -54,7 +54,10 @@ class MountLocal(Mount):
     """
     def __init__(self, local_dir, mount_point=None, cleanup=True,
                 filter_ext=('.pyc', '.log', '.mp4'),
-                filter_dir=('logs','slurm','pytorch-vqvae','plotting','data','attentive.egg-info'),
+                filter_dir=(
+                    'logs','slurm','pytorch-vqvae','plotting','data','attentive.egg-info',
+                    'singularity','figures','gym-minigrid','plotting',
+                ),
                 delete_before_mount=True,
                 **kwargs):
         """
