@@ -12,8 +12,6 @@ from doodad.utils import safe_import
 from doodad.apis.ec2.autoconfig import Autoconfig
 from doodad.credentials.ec2 import AWSCredentials
 
-from msrestazure.azure_exceptions import CloudError as AzureCloudError
-
 googleapiclient = safe_import.try_import('googleapiclient')
 googleapiclient.discovery = safe_import.try_import('googleapiclient.discovery')
 boto3 = safe_import.try_import('boto3')
@@ -738,6 +736,7 @@ class AzureMode(LaunchMode):
         from azure.mgmt.network import NetworkManagementClient
         from azure.mgmt.compute.models import DiskCreateOption
         from azure.mgmt.authorization import AuthorizationManagementClient
+        from msrestazure.azure_exceptions import CloudError as AzureCloudError
 
         # TODO: Remove this guard after Azure fixes the issue
         if self.preemptible:
@@ -858,6 +857,10 @@ class AzureMode(LaunchMode):
             params_identity = {
                 'type': models.ResourceIdentityType.system_assigned,
             }
+
+            # pubkey_path = os.path.expanduser('~/.ssh/id_rsa.pub')
+            # pubkey = open(pubkey_path).read().replace('\n', '')
+
             vm_parameters = {
                 'location': region,
                 'os_profile': {
@@ -865,6 +868,7 @@ class AzureMode(LaunchMode):
                     'admin_username': 'doodad',
                     'admin_password': 'Azure1',
                     'custom_data': custom_data,
+                    # 'ssh-key-values': [pubkey],
                 },
                 'hardware_profile': {
                     'vm_size': self.instance_type
@@ -929,6 +933,7 @@ class AzureMode(LaunchMode):
 
             # Add RG scope to the MSI tokenid
             tokens_left = [vm_result.identity.principal_id]
+
             while tokens_left:
                 try:
                     for i, msi_identity in enumerate(tokens_left):
@@ -958,6 +963,24 @@ class AzureMode(LaunchMode):
                 return False, e
             raise e
         success = True
+
+        ip_address = None
+        while success and ip_address is None:
+            poller = network_client.public_ip_addresses.create_or_update(
+                azure_resource_group,
+                'myIPAddress',
+                public_ip_addess_params
+            )
+            ip_address = poller.result().ip_address
+
+            # ip_address = network_poller.result().ip_address
+            time.sleep(1)
+            print('waiting for ip')
+            # import pdb; pdb.set_trace()
+
+        if success:
+            print('        ', resource_group.id.split('/')[-1], ip_address, '\n')
+
         return success, resource_group.id
 
 
