@@ -148,6 +148,7 @@ def run_sweep_doodad(
             njobs += 1
             cli_args= ' '.join(['--%s %s' % (key, config[key]) for key in config])
             cmd = archive + ' -- ' + cli_args
+            import pdb; pdb.set_trace()
             result = run_mode.run_script(cmd, return_output=return_output, verbose=False)
             if return_output:
                 result = archive_builder._strip_stdout(result)
