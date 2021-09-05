@@ -142,6 +142,7 @@ def run_sweep_doodad(
 
         sweeper = Sweeper(params, default_params)
         for config in sweeper:
+            print(f'[ doodad/hyper_sweep ] {config}')
             config, run_mode = postprocess_config_and_run_mode(config, run_mode, njobs)
             if config is None:
                 continue
