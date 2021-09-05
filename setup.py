@@ -5,6 +5,7 @@ setup(
     name='doodad',
     version='0.3.0dev',
     packages=find_packages(),
+    scripts=['doodad/darchive/makeself.sh'],
     license='MIT License',
     long_description=open('README.md').read(),
 )
