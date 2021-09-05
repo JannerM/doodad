@@ -5,7 +5,7 @@ import os.path as osp
 from typing import NamedTuple, List, Union
 
 import doodad
-from doodad.wrappers.easy_launch import config
+# from doodad.wrappers.easy_launch import config
 
 GitInfo = NamedTuple(
     'GitInfo',
@@ -30,19 +30,20 @@ DoodadConfig = NamedTuple(
 )
 
 
-def generate_git_infos():
+def generate_git_infos(code_dirs_to_mount):
     try:
         import git
         doodad_path = osp.abspath(osp.join(
             osp.dirname(doodad.__file__),
             os.pardir
         ))
-        dirs = config.CODE_DIRS_TO_MOUNT + [doodad_path]
+        dirs = code_dirs_to_mount + [doodad_path]
 
         git_infos = []
         for directory in dirs:
             # Idk how to query these things, so I'm just doing try-catch
             try:
+                print(directory)
                 repo = git.Repo(directory)
                 try:
                     branch_name = repo.active_branch.name

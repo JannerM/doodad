@@ -26,7 +26,8 @@ class DoodadSweeper(object):
             mount_out_azure=None,
             local_shell_interpreter='sh',
             local_async_run=False,
-            local_use_gpu=False
+            local_use_gpu=False,
+            **mount_kwargs,
     ):
         if mounts is None:
             mounts = []
@@ -43,7 +44,7 @@ class DoodadSweeper(object):
         #mounts.append(mount.MountLocal(local_dir=REPO_DIR, pythonpath=True))
         self.docker_output_dir = docker_output_dir
         self.mounts = mounts
-        self.mount_out_local = mount.MountLocal(local_dir=local_output_dir, mount_point=docker_output_dir, output=True)
+        self.mount_out_local = mount.MountLocal(local_dir=local_output_dir, mount_point=docker_output_dir, output=True, **mount_kwargs)
 
         self.gcp_bucket_name = gcp_bucket_name
         self.gcp_image = gcp_image
@@ -137,6 +138,7 @@ class DoodadSweeper(object):
                         use_gpu=False,
                         num_gpu=1,
                         gpu_model='nvidia-tesla-k80',
+                        filter_dir=[],
                         **kwargs):
         """
         Run a grid search on GCP
@@ -176,5 +178,6 @@ class DoodadSweeper(object):
                                          run_mode=run_mode,
                                          docker_image=self.image,
                                          mounts=self.mounts+[self.mount_out_azure]+extra_mounts,
+                                         filter_dir=filter_dir,
                                          **kwargs)
 

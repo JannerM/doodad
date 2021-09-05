@@ -53,7 +53,7 @@ class MountLocal(Mount):
     """
     """
     def __init__(self, local_dir, mount_point=None, cleanup=True,
-                filter_ext=('.pyc', '.log', '.mp4'),
+                filter_ext=('.pyc', '.log', '.mp4', '.egg-info'),
                 filter_dir=(
                     'logs','slurm','pytorch-vqvae','plotting','data','attentive.egg-info',
                     'singularity','figures','gym-minigrid','plotting',
@@ -89,7 +89,7 @@ class MountLocal(Mount):
         :param kwargs:
         """
         super(MountLocal, self).__init__(mount_point=mount_point, **kwargs)
-        print("FILTER", filter_dir)
+        print(f'Filtering directories: {filter_dir}')
         self.local_dir = os.path.realpath(os.path.expanduser(local_dir))
         self._name = self.local_dir.replace('/', '_')
         self.sync_dir = self.local_dir

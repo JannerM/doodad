@@ -1,37 +1,46 @@
 import sys
 import time
 import os.path as osp
+import importlib
 
 from doodad import mode as ddmode
 from doodad.utils import REPO_DIR
 
 import doodad
 from doodad.wrappers.easy_launch import run_experiment, metadata
-from doodad.wrappers.easy_launch import config
 from doodad.wrappers.easy_launch.metadata import save_doodad_config
 from doodad.wrappers.sweeper import DoodadSweeper
 from doodad.wrappers.sweeper.hyper_sweep import Sweeper
 
+def load_from_file(path):
+    spec = importlib.util.spec_from_file_location('spec', path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+CWD = osp.dirname(__file__)
 
 def sweep_function(
         method_call,
         params,
         log_path,
-        default_params=None,
+        default_params={},
         use_cloudpickle=True,
-        add_date_to_logname=True,
+        add_date_to_logname=False,
         mode='azure',
         use_gpu=False,
         num_gpu=1,
-        name_runs_by_id=True,
+        name_runs_by_id=False,
         add_time_to_run_id='behind',
         start_run_id=0,
-        docker_image=config.DEFAULT_DOCKER,
+        config_path=osp.join(CWD, 'config.py'),
+        docker_image=None,
         extra_launch_info=None,
-        code_dirs_to_mount=config.CODE_DIRS_TO_MOUNT,
-        non_code_dirs_to_mount=config.NON_CODE_DIRS_TO_MOUNT,
-        remote_mount_configs=config.REMOTE_DIRS_TO_MOUNT,
-        azure_region=config.DEFAULT_AZURE_REGION,
+        code_dirs_to_mount=None,
+        non_code_dirs_to_mount=None,
+        remote_mount_configs=None,
+        azure_region=None,
+        **mount_kwargs,
 ):
     """
     Usage:
@@ -83,6 +92,16 @@ def sweep_function(
     :param start_run_id:
     :return: How many
     """
+
+    print(f'[ doodad/core ] config path: {config_path}')
+    config = load_from_file(config_path)
+
+    docker_image = docker_image or config.DEFAULT_DOCKER
+    code_dirs_to_mount = code_dirs_to_mount or config.CODE_DIRS_TO_MOUNT
+    non_code_dirs_to_mount = non_code_dirs_to_mount or config.NON_CODE_DIRS_TO_MOUNT
+    remote_mount_configs = remote_mount_configs or config.REMOTE_DIRS_TO_MOUNT
+    azure_region = azure_region or config.DEFAULT_AZURE_REGION
+
     if extra_launch_info is None:
         extra_launch_info = {}
     if add_date_to_logname:
@@ -96,9 +115,11 @@ def sweep_function(
         code_dirs_to_mount=code_dirs_to_mount,
         non_code_dirs_to_mount=non_code_dirs_to_mount,
         remote_mount_configs=remote_mount_configs,
+        config=config,
         use_gpu=use_gpu,
+        **mount_kwargs,
     )
-    git_infos = metadata.generate_git_infos()
+    git_infos = metadata.generate_git_infos(config.CODE_DIRS_TO_MOUNT)
 
     doodad_config = metadata.DoodadConfig(
         use_gpu=use_gpu,
@@ -126,6 +147,7 @@ def sweep_function(
     if mode == 'here_no_doodad':
         return _run_method_here_no_doodad(
             method_call,
+            config,
             doodad_config,
             params,
             default_params,
@@ -173,6 +195,7 @@ def sweep_function(
                 num_gpu=num_gpu,
                 region=azure_region,
                 is_docker_interactive=False,
+                **mount_kwargs,
             )
         elif mode == 'gcp':
             sweeper.run_sweep_gcp(
@@ -201,7 +224,7 @@ def sweep_function(
 
 
 def _run_method_here_no_doodad(
-        method_call, doodad_config, params, default_params, log_path,
+        method_call, config, doodad_config, params, default_params, log_path,
         create_final_log_path
 ):
     sweeper = Sweeper(params, default_params)
@@ -215,12 +238,14 @@ def _run_method_here_no_doodad(
 
 
 def create_mounts(
-        code_dirs_to_mount=config.CODE_DIRS_TO_MOUNT,
-        non_code_dirs_to_mount=config.NON_CODE_DIRS_TO_MOUNT,
-        remote_mount_configs=config.REMOTE_DIRS_TO_MOUNT,
+        code_dirs_to_mount,
+        non_code_dirs_to_mount,
+        remote_mount_configs,
+        config,
+        **mount_kwargs,
 ):
     non_code_mounts = [
-        doodad.MountLocal(**non_code_mapping)
+        doodad.MountLocal(**non_code_mapping, **mount_kwargs)
         for non_code_mapping in non_code_dirs_to_mount
     ] + [
         doodad.MountRemote(**non_code_mapping)
@@ -229,7 +254,7 @@ def create_mounts(
     if REPO_DIR not in config.CODE_DIRS_TO_MOUNT:
         config.CODE_DIRS_TO_MOUNT.append(REPO_DIR)
     code_mounts = [
-        doodad.MountLocal(local_dir=code_dir, pythonpath=True)
+        doodad.MountLocal(local_dir=code_dir, pythonpath=True, **mount_kwargs)
         for code_dir in code_dirs_to_mount
     ]
     mounts = code_mounts + non_code_mounts
@@ -240,15 +265,19 @@ def create_sweeper_and_output_mount(
         mode,
         log_path,
         docker_image,
-        code_dirs_to_mount=config.CODE_DIRS_TO_MOUNT,
-        non_code_dirs_to_mount=config.NON_CODE_DIRS_TO_MOUNT,
-        remote_mount_configs=config.REMOTE_DIRS_TO_MOUNT,
+        code_dirs_to_mount,
+        non_code_dirs_to_mount,
+        remote_mount_configs,
+        config,
         use_gpu=False,
+        **mount_kwargs,
 ):
     mounts = create_mounts(
         code_dirs_to_mount=code_dirs_to_mount,
         non_code_dirs_to_mount=non_code_dirs_to_mount,
         remote_mount_configs=remote_mount_configs,
+        config=config,
+        **mount_kwargs,
     )
     az_mount = doodad.MountAzure(
         '',
@@ -266,6 +295,7 @@ def create_sweeper_and_output_mount(
         mount_out_azure=az_mount,
         local_output_dir=osp.join(config.LOCAL_LOG_DIR, log_path),  # TODO: how to make this vary in local mode?
         local_use_gpu=use_gpu,
+        **mount_kwargs,
     )
     # TODO: the sweeper should probably only have one output mount that is
     # set rather than read based on the mode

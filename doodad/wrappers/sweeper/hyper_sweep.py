@@ -115,12 +115,13 @@ def run_sweep_doodad(
         is_docker_interactive=False,
         return_output=False, verbose=False,
         postprocess_config_and_run_mode=lambda config, run_mode, idx: (config, run_mode),
-        default_params=None
+        default_params=None,
+        **mount_kwargs,
 ):
     # build archive
     target_dir = os.path.dirname(target)
     target_mount_dir = os.path.join('target', os.path.basename(target_dir))
-    target_mount = mount.MountLocal(local_dir=target_dir, mount_point=target_mount_dir)
+    target_mount = mount.MountLocal(local_dir=target_dir, mount_point=target_mount_dir, **mount_kwargs)
     mounts = list(mounts) + [target_mount]
     target_full_path = os.path.join(target_mount.mount_point, os.path.basename(target))
     command = launch_api.make_python_command(

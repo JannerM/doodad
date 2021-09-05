@@ -972,11 +972,7 @@ class AzureMode(LaunchMode):
                 public_ip_addess_params
             )
             ip_address = poller.result().ip_address
-
-            # ip_address = network_poller.result().ip_address
             time.sleep(1)
-            print('waiting for ip')
-            # import pdb; pdb.set_trace()
 
         if success:
             print('        ', resource_group.id.split('/')[-1], ip_address, '\n')
