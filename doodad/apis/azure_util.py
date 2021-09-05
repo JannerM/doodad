@@ -5,9 +5,10 @@ from doodad.utils import REPO_DIR, safe_import
 blob = safe_import.try_import('azure.storage.blob')
 azure = safe_import.try_import('azure')
 
-AZURE_STARTUP_SCRIPT_PATH = os.path.join(REPO_DIR, "scripts/azure/azure_startup_script.sh")
-AZURE_SHUTDOWN_SCRIPT_PATH = os.path.join(REPO_DIR, "scripts/azure/azure_shutdown_script.sh")
-AZURE_CLOUD_INIT_PATH = os.path.join(REPO_DIR, "scripts/azure/cloud-init.txt")
+ABSPATH = os.path.dirname(__file__)
+AZURE_STARTUP_SCRIPT_PATH = os.path.join(ABSPATH, 'azure/azure_startup_script.sh')
+AZURE_SHUTDOWN_SCRIPT_PATH = os.path.join(ABSPATH, 'azure/azure_shutdown_script.sh')
+AZURE_CLOUD_INIT_PATH = os.path.join(ABSPATH, 'azure/cloud-init.txt')
 
 
 def upload_file_to_azure_storage(
