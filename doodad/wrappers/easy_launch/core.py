@@ -40,6 +40,8 @@ def sweep_function(
         non_code_dirs_to_mount=None,
         remote_mount_configs=None,
         azure_region=None,
+        instance_type=None,
+        gpu_model=None,
         **mount_kwargs,
 ):
     """
@@ -93,7 +95,7 @@ def sweep_function(
     :return: How many
     """
 
-    print(f'[ doodad/core ] config path: {config_path}')
+    print(f'[ doodad/core ] Config path: {config_path}')
     config = load_from_file(config_path)
 
     docker_image = docker_image or config.DEFAULT_DOCKER
@@ -101,6 +103,10 @@ def sweep_function(
     non_code_dirs_to_mount = non_code_dirs_to_mount or config.NON_CODE_DIRS_TO_MOUNT
     remote_mount_configs = remote_mount_configs or config.REMOTE_DIRS_TO_MOUNT
     azure_region = azure_region or config.DEFAULT_AZURE_REGION
+    instance_type = instance_type or config.DEFAULT_AZURE_INSTANCE_TYPE
+    gpu_model = gpu_model or config.DEFAULT_AZURE_GPU_MODEL
+
+    print(f'[ doodad/core ] GPU model: {gpu_model}')
 
     if extra_launch_info is None:
         extra_launch_info = {}
@@ -189,8 +195,8 @@ def sweep_function(
                 log_path=log_path,
                 add_date_to_logname=False,
                 postprocess_config_and_run_mode=postprocess_config_and_run_mode,
-                instance_type=config.DEFAULT_AZURE_INSTANCE_TYPE,
-                gpu_model=config.DEFAULT_AZURE_GPU_MODEL,
+                instance_type=instance_type,
+                gpu_model=gpu_model,
                 use_gpu=use_gpu,
                 num_gpu=num_gpu,
                 region=azure_region,
