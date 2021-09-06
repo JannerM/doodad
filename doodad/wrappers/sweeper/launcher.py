@@ -27,6 +27,9 @@ class DoodadSweeper(object):
             local_shell_interpreter='sh',
             local_async_run=False,
             local_use_gpu=False,
+            azure_resource_group=None,
+            azure_vm_name=None,
+            azure_vm_password=None,
             **mount_kwargs,
     ):
         if mounts is None:
@@ -57,6 +60,10 @@ class DoodadSweeper(object):
         self.azure_authentication_key = azure_authentication_key
         self.azure_tenant_id = azure_tenant_id
         self.azure_storage_container = azure_storage_container
+        self.azure_resource_group = azure_resource_group
+        self.azure_vm_name = azure_vm_name
+        self.azure_vm_password = azure_vm_password
+
         self.mount_out_azure = (
                 mount_out_azure
                 or mount.MountAzure(azure_path='azure_script_output', mount_point=docker_output_dir)
@@ -165,6 +172,9 @@ class DoodadSweeper(object):
             use_gpu=use_gpu,
             gpu_model=gpu_model,
             num_gpu=num_gpu,
+            azure_resource_group=self.azure_resource_group,
+            azure_vm_name=self.azure_vm_name,
+            azure_vm_password=self.azure_vm_password,
         )
         if num_chunks > 0:
             hyper_sweep.run_sweep_doodad_chunked(target, params,

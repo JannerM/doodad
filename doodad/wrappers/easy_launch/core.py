@@ -42,6 +42,9 @@ def sweep_function(
         azure_region=None,
         instance_type=None,
         gpu_model=None,
+        resource_group=None,
+        vm_name=None,
+        vm_password=None,
         **mount_kwargs,
 ):
     """
@@ -105,6 +108,9 @@ def sweep_function(
     azure_region = azure_region or config.DEFAULT_AZURE_REGION
     instance_type = instance_type or config.DEFAULT_AZURE_INSTANCE_TYPE
     gpu_model = gpu_model or config.DEFAULT_AZURE_GPU_MODEL
+    azure_resource_group = resource_group or config.DEFAULT_AZURE_RESOURCE_GROUP
+    azure_vm_name = vm_name or config.DEFAULT_AZURE_VM_NAME
+    azure_vm_password = vm_password or config.DEFAULT_AZURE_VM_PASSWORD
 
     print(f'[ doodad/core ] GPU model: {gpu_model}')
 
@@ -123,6 +129,9 @@ def sweep_function(
         remote_mount_configs=remote_mount_configs,
         config=config,
         use_gpu=use_gpu,
+        azure_resource_group=azure_resource_group,
+        azure_vm_name=azure_vm_name,
+        azure_vm_password=azure_vm_password,
         **mount_kwargs,
     )
     git_infos = metadata.generate_git_infos(config.CODE_DIRS_TO_MOUNT)
@@ -276,6 +285,9 @@ def create_sweeper_and_output_mount(
         remote_mount_configs,
         config,
         use_gpu=False,
+        azure_vm_name=None,
+        azure_resource_group=None,
+        azure_vm_password=None,
         **mount_kwargs,
 ):
     mounts = create_mounts(
@@ -301,6 +313,9 @@ def create_sweeper_and_output_mount(
         mount_out_azure=az_mount,
         local_output_dir=osp.join(config.LOCAL_LOG_DIR, log_path),  # TODO: how to make this vary in local mode?
         local_use_gpu=use_gpu,
+        azure_resource_group=azure_resource_group,
+        azure_vm_name=azure_vm_name,
+        azure_vm_password=azure_vm_password,
         **mount_kwargs,
     )
     # TODO: the sweeper should probably only have one output mount that is

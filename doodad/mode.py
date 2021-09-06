@@ -1,6 +1,7 @@
 import os
 import json
 import time
+import copy
 import uuid
 import six
 import base64
@@ -598,7 +599,9 @@ class AzureMode(LaunchMode):
                  azure_authentication_key,
                  azure_tenant_id,
                  log_path,
-                 azure_resource_group=None,
+                 azure_resource_group='doodad',
+                 azure_vm_name='doodad-vm',
+                 azure_vm_password='Azure1',
                  terminate_on_end=True,
                  preemptible=False,
                  region='eastus',
@@ -613,9 +616,9 @@ class AzureMode(LaunchMode):
                  **kwargs):
         super(AzureMode, self).__init__(**kwargs)
         self.subscription_id = azure_subscription_id
-        if azure_resource_group is None:
-            azure_resource_group = 'doodad'
         self.azure_resource_group_base = azure_resource_group
+        self.azure_vm_name = azure_vm_name
+        self.azure_vm_password = azure_vm_password
         self.azure_container = azure_storage_container
         self.azure_client_id = azure_client_id
         self.azure_authentication_key = azure_authentication_key
@@ -628,6 +631,7 @@ class AzureMode(LaunchMode):
         self.spot_max_price = spot_price
         self._retry_regions = retry_regions
         self.gpu_model = gpu_model
+
         if tags is None:
             from os import environ, getcwd
             getUser = lambda: environ["USERNAME"] if "C:" in getcwd() else environ[
@@ -643,6 +647,7 @@ class AzureMode(LaunchMode):
             track of who is running which experiment.
             """)
         self.tags = tags
+        self.tags_extra = {}
 
         self.connection_str = azure_storage_connection_str
         self.connection_info = dict([k.split('=', 1) for k in self.connection_str.split(';')])
@@ -664,6 +669,12 @@ class AzureMode(LaunchMode):
 
     def print_launch_message(self):
         print('Go to https://portal.azure.com/ to monitor jobs.')
+
+    def add_job_tags(self, params):
+        self.tags_extra = copy.deepcopy(params)
+
+    def combine_tags(self):
+        return dict(self.tags, **self.tags_extra)
 
     def run_script(self, script, dry=False, return_output=False, verbose=False):
         if return_output:
@@ -744,7 +755,8 @@ class AzureMode(LaunchMode):
             print("This guard will be removed as soon as the issue is fixed.")
             exit(1)
 
-        azure_resource_group = self.azure_resource_group_base+uuid.uuid4().hex[:6]
+        azure_resource_group = self.azure_resource_group_base + '-' + uuid.uuid4().hex[:6]
+        vm_name = self.azure_vm_name
         region = metadata['region']
         instance_type_str = 'a spot instance' if self.preemptible else 'an instance'
         print('Creating {} of type {} in {}'.format(instance_type_str, self.instance_type, region))
@@ -772,13 +784,13 @@ class AzureMode(LaunchMode):
         )
         resource_group_params = {
             'location': region,
-            'tags': self.tags,
+            'tags': self.combine_tags(),
         }
         resource_group = resource_group_client.resource_groups.create_or_update(
             azure_resource_group,
             resource_group_params
         )
-        vm_name = 'ambr-doodad-vm'
+
         print('VM name:', vm_name)
         print('resource group id:', resource_group.id)
 
@@ -866,7 +878,7 @@ class AzureMode(LaunchMode):
                 'os_profile': {
                     'computer_name': vm_name,
                     'admin_username': 'doodad',
-                    'admin_password': 'Azure1',
+                    'admin_password': self.azure_vm_password,
                     'custom_data': custom_data,
                     # 'ssh-key-values': [pubkey],
                 },
@@ -888,7 +900,7 @@ class AzureMode(LaunchMode):
                         'id': nic.id
                     }]
                 },
-                'tags': self.tags,
+                'tags': self.combine_tags(),
                 'identity': params_identity,
             }
             if metadata['use_data_science_image']:
@@ -971,7 +983,7 @@ class AzureMode(LaunchMode):
             time.sleep(1)
 
         if success:
-            print('        ', resource_group.id.split('/')[-1], ip_address, '\n')
+            print(f'        Resource group: {resource_group.id.split("/")[-1]} | VM: {self.azure_vm_name} | IP: {ip_address} \n')
 
         return success, resource_group.id
 
