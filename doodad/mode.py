@@ -983,7 +983,7 @@ class AzureMode(LaunchMode):
             time.sleep(1)
 
         if success:
-            print(f'        Resource group: {resource_group.id.split("/")[-1]} | VM: {self.azure_vm_name} | IP: {ip_address} \n')
+            print(f'\n        Resource group: {resource_group.id.split("/")[-1]} | VM: {self.azure_vm_name} | IP: {ip_address} \n')
 
         return success, resource_group.id
 
