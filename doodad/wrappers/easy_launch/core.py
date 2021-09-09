@@ -43,6 +43,7 @@ def sweep_function(
         instance_type=None,
         gpu_model=None,
         resource_group=None,
+        storage_container=None,
         vm_name=None,
         vm_password=None,
         **mount_kwargs,
@@ -111,6 +112,7 @@ def sweep_function(
     azure_resource_group = resource_group or config.DEFAULT_AZURE_RESOURCE_GROUP
     azure_vm_name = vm_name or config.DEFAULT_AZURE_VM_NAME
     azure_vm_password = vm_password or config.DEFAULT_AZURE_VM_PASSWORD
+    azure_storage_container = storage_container or config.AZ_CONTAINER
 
     print(f'[ doodad/core ] Docker image: {docker_image}')
     print(f'[ doodad/core ] GPU model: {gpu_model}')
@@ -134,6 +136,7 @@ def sweep_function(
         azure_resource_group=azure_resource_group,
         azure_vm_name=azure_vm_name,
         azure_vm_password=azure_vm_password,
+        azure_storage_container=azure_storage_container,
         **mount_kwargs,
     )
     git_infos = metadata.generate_git_infos(config.CODE_DIRS_TO_MOUNT)
@@ -290,6 +293,7 @@ def create_sweeper_and_output_mount(
         azure_vm_name=None,
         azure_resource_group=None,
         azure_vm_password=None,
+        azure_storage_container=None,
         **mount_kwargs,
 ):
     mounts = create_mounts(
@@ -311,7 +315,7 @@ def create_sweeper_and_output_mount(
         azure_client_id=config.AZ_CLIENT_ID,
         azure_authentication_key=config.AZ_SECRET,
         azure_tenant_id=config.AZ_TENANT_ID,
-        azure_storage_container=config.AZ_CONTAINER,
+        azure_storage_container=azure_storage_container,
         mount_out_azure=az_mount,
         local_output_dir=osp.join(config.LOCAL_LOG_DIR, log_path),  # TODO: how to make this vary in local mode?
         local_use_gpu=use_gpu,
