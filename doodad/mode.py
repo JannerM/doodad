@@ -674,7 +674,9 @@ class AzureMode(LaunchMode):
         self.tags_extra = copy.deepcopy(params)
 
     def combine_tags(self):
-        return dict(self.tags, **self.tags_extra)
+        tags = dict(self.tags, **self.tags_extra)
+        tags = {k: str(v) for k, v in tags.items()}
+        return tags
 
     def run_script(self, script, dry=False, return_output=False, verbose=False):
         if return_output:

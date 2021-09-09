@@ -112,7 +112,9 @@ def sweep_function(
     azure_vm_name = vm_name or config.DEFAULT_AZURE_VM_NAME
     azure_vm_password = vm_password or config.DEFAULT_AZURE_VM_PASSWORD
 
+    print(f'[ doodad/core ] Docker image: {docker_image}')
     print(f'[ doodad/core ] GPU model: {gpu_model}')
+    print(f'[ doodad/core ] Default region: {azure_region}')
 
     if extra_launch_info is None:
         extra_launch_info = {}
