@@ -1,6 +1,7 @@
 import os
 import json
 import time
+import datetime
 import copy
 import uuid
 import six
@@ -758,7 +759,7 @@ class AzureMode(LaunchMode):
             exit(1)
 
         azure_resource_group = self.azure_resource_group_base + '-' + uuid.uuid4().hex[:6]
-        vm_name = self.azure_vm_name
+        vm_name = self.azure_vm_name + '-' + datetime.datetime.now().strftime('%m.%d.%H-%M-%S')
         region = metadata['region']
         instance_type_str = 'a spot instance' if self.preemptible else 'an instance'
         print('Creating {} of type {} in {}'.format(instance_type_str, self.instance_type, region))
